@@ -8,10 +8,10 @@ fn main() {
         Direction::Forward,
         Weather::Dry,
         Group::Sixties,
-        Filter::OnlyMe,
+        Filter::Friends,
         Platform::Steam,
         76561198230518420,
-        vec![76561198087789780],
+        vec![76561198087789780, 2],
     );
 
     println!("{:#?}", entries);
@@ -35,7 +35,9 @@ fn get_leaderboard_entries(
     let filter_index = filter as isize;
     let platform_index = platform as isize;
 
-    let body = reqwest::blocking::get(format!("https://www.funselektorfun.com/artofrally/leaderboard/{area_name}_Stage_{stage}_{direction_name}_{weather_name}_{group_name}/{filter_index}/{platform_index}/{user}")).unwrap().text().unwrap();
+    let friend_list: String = format!("{:?}", friends);
+
+    let body = reqwest::blocking::get(format!("https://www.funselektorfun.com/artofrally/leaderboard/{area_name}_Stage_{stage}_{direction_name}_{weather_name}_{group_name}/{filter_index}/{platform_index}/{user}/{friend_list}")).unwrap().text().unwrap();
 
     let result: Response = serde_json::from_str(&body).expect("response is not well-formated");
 
