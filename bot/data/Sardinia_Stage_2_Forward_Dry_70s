@@ -1,0 +1,22 @@
+[
+  {
+    "uniqueID": 27268,
+    "userName": "sornas",
+    "rank": 1,
+    "score": 100231,
+    "country": 150,
+    "carID": 1,
+    "replayData": "_00J0FA1ArNJMPZcqEb5ka6bKyk",
+    "platformID": 2
+  },
+  {
+    "uniqueID": 27105,
+    "userName": "Gurka",
+    "rank": 2,
+    "score": 111246,
+    "country": 150,
+    "carID": 5,
+    "replayData": "aQRFXuogAgYk4MWoDd4vVVPsAxE",
+    "platformID": 2
+  }
+]

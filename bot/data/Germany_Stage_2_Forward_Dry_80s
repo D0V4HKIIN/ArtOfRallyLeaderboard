@@ -1,0 +1,32 @@
+[
+  {
+    "uniqueID": 18271,
+    "userName": "sornas",
+    "rank": 1,
+    "score": 176986,
+    "country": 150,
+    "carID": 2,
+    "replayData": "8aSv2f7kJx-4Q0Qfs95ZVk7ckj0",
+    "platformID": 2
+  },
+  {
+    "uniqueID": 25142,
+    "userName": "jonais",
+    "rank": 2,
+    "score": 204581,
+    "country": 53,
+    "carID": 9,
+    "replayData": "ZYBprkwXF1ZtqxBbdVI6dusISuw",
+    "platformID": 2
+  },
+  {
+    "uniqueID": 18111,
+    "userName": "Gurka",
+    "rank": 3,
+    "score": 222131,
+    "country": 150,
+    "carID": 2,
+    "replayData": "iUg1kgJIwMkEGp-phwzzmABWnjM",
+    "platformID": 2
+  }
+]

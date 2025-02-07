@@ -2,6 +2,9 @@ extern crate reqwest;
 use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::Write;
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
+
 fn main() {
     println!("Hello, world!");
     let area = Area::Finland;
@@ -11,25 +14,43 @@ fn main() {
     let group = Group::Sixties;
     let filter = Filter::Friends;
     let platform = Platform::Steam;
+    let user = 76561198230518420;
+    let friends = &vec![76561198087789780, 76561198062269100];
     let entries = get_leaderboard_entries(
-        &area,
-        stage,
-        &direction,
-        &weather,
-        &group,
-        &filter,
-        &platform,
-        76561198230518420,
-        &vec![76561198087789780, 76561198062269100],
+        &area, stage, &direction, &weather, &group, &filter, &platform, user, &friends,
     );
 
     println!("{:#?}", entries);
+
+    save_all_stages(&platform, &filter, user, friends);
 
     // save_entries(&entries, &area, stage, &direction, &weather, &group);
     // println!(
     //     "{:#?}",
     //     read_entries(&area, stage, &direction, &weather, &group).unwrap()
     // );
+}
+
+fn save_all_stages(platform: &Platform, filter: &Filter, user: u64, friends: &Vec<u64>) -> () {
+    for area in Area::iter() {
+        for stage in 1..=6 {
+            for direction in Direction::iter() {
+                for weather in Weather::iter() {
+                    for group in Group::iter() {
+                        println!(
+                            "getting {}",
+                            stage_string(&area, stage, &direction, &weather, &group)
+                        );
+                        let entries = get_leaderboard_entries(
+                            &area, stage, &direction, &weather, &group, &filter, &platform, user,
+                            friends,
+                        );
+                        save_entries(&entries, &area, stage, &direction, &weather, &group);
+                    }
+                }
+            }
+        }
+    }
 }
 
 fn stage_string(
@@ -45,6 +66,19 @@ fn stage_string(
     let group_name = group.value();
 
     return format!("{area_name}_Stage_{stage}_{direction_name}_{weather_name}_{group_name}");
+}
+
+fn save_path(
+    area: &Area,
+    stage: usize, // should be 1,2,3,4,5,6
+    direction: &Direction,
+    weather: &Weather,
+    group: &Group,
+) -> String {
+    format!(
+        "data/{}",
+        stage_string(area, stage, direction, weather, group)
+    )
 }
 
 fn get_leaderboard_entries(
@@ -64,6 +98,8 @@ fn get_leaderboard_entries(
 
     let friend_list: String = format!("{:?}", friends).split_whitespace().collect();
 
+    // println!("https://www.funselektorfun.com/artofrally/leaderboard/{stage_string}/{filter_index}/{platform_index}/{user}/{friend_list}");
+
     let body = reqwest::blocking::get(format!("https://www.funselektorfun.com/artofrally/leaderboard/{stage_string}/{filter_index}/{platform_index}/{user}/{friend_list}")).unwrap().text().unwrap();
 
     let result: Response = serde_json::from_str(&body).expect("response is not well-formated");
@@ -82,7 +118,7 @@ fn save_entries(
     let json_entries = serde_json::to_string_pretty(&entries)
         .expect(&format!("failed to serialize entries {:?}", entries));
 
-    let mut file = File::create(stage_string(area, stage, direction, weather, group))
+    let mut file = File::create(save_path(area, stage, direction, weather, group))
         .expect("failed to create stage file");
     file.write_all(json_entries.as_bytes())
         .expect("failed to write to stage file");
@@ -95,7 +131,7 @@ fn read_entries(
     weather: &Weather,
     group: &Group,
 ) -> Result<Vec<LeaderboardEntry>, serde_json::Error> {
-    let file = File::open(stage_string(area, stage, direction, weather, group))
+    let file = File::open(save_path(area, stage, direction, weather, group))
         .expect("can't open stage file");
 
     serde_json::from_reader(file)
@@ -122,6 +158,7 @@ struct LeaderboardEntry {
     platformID: u8,
 }
 
+#[derive(EnumIter)]
 enum Area {
     Finland,
     Sardinia,
@@ -129,6 +166,8 @@ enum Area {
     Norway,
     Germany,
     Kenya,
+    Indonesia,
+    Australia,
 }
 
 impl Area {
@@ -140,10 +179,13 @@ impl Area {
             Area::Norway => "Norway",
             Area::Germany => "Germany",
             Area::Kenya => "Kenya",
+            Area::Indonesia => "Indonesia",
+            Area::Australia => "Australia",
         }
     }
 }
 
+#[derive(EnumIter)]
 enum Direction {
     Forward,
     Backward,
@@ -158,6 +200,7 @@ impl Direction {
     }
 }
 
+#[derive(EnumIter)]
 enum Weather {
     Dry,
     Wet,
@@ -172,6 +215,7 @@ impl Weather {
     }
 }
 
+#[derive(EnumIter)]
 enum Group {
     Sixties,
     Seventies,
@@ -202,7 +246,7 @@ impl Group {
     }
 }
 
-// idk what i am doing with all theses numbers :))
+#[derive(EnumIter)]
 enum Filter {
     Top,
     AroundMe,
